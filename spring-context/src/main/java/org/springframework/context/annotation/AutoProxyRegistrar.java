@@ -68,7 +68,7 @@ public class AutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 			}
 			// 获取通知模式
 			Object mode = candidate.get("mode");
-			// 获取代理类型
+			// 获取代理的类型
 			Object proxyTargetClass = candidate.get("proxyTargetClass");
 			if (mode != null && proxyTargetClass != null && AdviceMode.class == mode.getClass() &&
 					Boolean.class == proxyTargetClass.getClass()) {
