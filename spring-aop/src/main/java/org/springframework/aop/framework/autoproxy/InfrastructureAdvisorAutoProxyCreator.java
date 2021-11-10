@@ -40,6 +40,8 @@ public class InfrastructureAdvisorAutoProxyCreator extends AbstractAdvisorAutoPr
 		this.beanFactory = beanFactory;
 	}
 
+	// 判断切面是否合格
+	// 此处判断beanDefinition的role属性是否为BeanDefinition.ROLE_INFRASTRUCTURE属性
 	@Override
 	protected boolean isEligibleAdvisorBean(String beanName) {
 		return (this.beanFactory != null && this.beanFactory.containsBeanDefinition(beanName) &&
