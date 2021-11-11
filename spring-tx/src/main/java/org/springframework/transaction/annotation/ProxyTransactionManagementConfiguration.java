@@ -35,12 +35,18 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  * @see EnableTransactionManagement
  * @see TransactionManagementConfigurationSelector
  */
+// 此类是一个配置类,在此类中定义了3个bean
 @Configuration(proxyBeanMethods = false)
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class ProxyTransactionManagementConfiguration extends AbstractTransactionManagementConfiguration {
 
 	@Bean(name = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME)
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+	// 该bean包含了TransactionAttributeSource和TransactionInterceptor
+	// 我们应该知道,一般spring切面advisor由pointcut和advice组成
+	// 而TransactionInterceptor实现了Advice接口
+	// 并且BeanFactoryTransactionAttributeSourceAdvisor这个class本身就定义了一个pointcut属性
+	// 有了advice+pointcut那么tx切面就可以正常运行了
 	public BeanFactoryTransactionAttributeSourceAdvisor transactionAdvisor(
 			TransactionAttributeSource transactionAttributeSource, TransactionInterceptor transactionInterceptor) {
 

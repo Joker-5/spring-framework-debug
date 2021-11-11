@@ -114,6 +114,7 @@ public abstract class AopConfigUtils {
 		}
 	}
 
+	// 用于注册aop入口类
 	@Nullable
 	private static BeanDefinition registerOrEscalateApcAsRequired(
 			Class<?> cls, BeanDefinitionRegistry registry, @Nullable Object source) {
