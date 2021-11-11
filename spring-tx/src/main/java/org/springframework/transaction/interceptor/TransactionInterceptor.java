@@ -51,6 +51,7 @@ import org.springframework.transaction.TransactionManager;
  * @see org.springframework.aop.framework.ProxyFactory
  */
 @SuppressWarnings("serial")
+// 实现了tx里面的逻辑
 public class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor, Serializable {
 
 	/**

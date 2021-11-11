@@ -76,6 +76,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 * <p>As this base class is not marked Serializable, the cache will be recreated
 	 * after serialization - provided that the concrete subclass is Serializable.
 	 */
+	// TransactionAttributes的缓存
 	private final Map<Object, TransactionAttribute> attributeCache = new ConcurrentHashMap<>(1024);
 
 
@@ -95,25 +96,34 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		}
 
 		// First, see if we have a cached value.
+		// 获取缓存的key
 		Object cacheKey = getCacheKey(method, targetClass);
+		// 根据key从缓存中获取TransactionAttribute对象
 		TransactionAttribute cached = this.attributeCache.get(cacheKey);
+		// 如果缓存不为空则根据情况进行返回
 		if (cached != null) {
 			// Value will either be canonical value indicating there is no transaction attribute,
 			// or an actual transaction attribute.
+			// 如果cache值是自定义的空值，则直接返回null
 			if (cached == NULL_TRANSACTION_ATTRIBUTE) {
 				return null;
 			}
+			// 否则正常返回缓存值
 			else {
 				return cached;
 			}
 		}
+		// 缓存值为空
 		else {
 			// We need to work it out.
+			// 计算TransactionAttribute
 			TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);
 			// Put it in the cache.
+			// 如果计算结果为空则缓存自定义的那个空值
 			if (txAttr == null) {
 				this.attributeCache.put(cacheKey, NULL_TRANSACTION_ATTRIBUTE);
 			}
+			// 否则将缓存值添加到缓存中
 			else {
 				String methodIdentification = ClassUtils.getQualifiedMethodName(method, targetClass);
 				if (txAttr instanceof DefaultTransactionAttribute) {
@@ -122,6 +132,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 				if (logger.isTraceEnabled()) {
 					logger.trace("Adding transactional method '" + methodIdentification + "' with attribute: " + txAttr);
 				}
+				// 加入缓存
 				this.attributeCache.put(cacheKey, txAttr);
 			}
 			return txAttr;
@@ -150,6 +161,8 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	@Nullable
 	protected TransactionAttribute computeTransactionAttribute(Method method, @Nullable Class<?> targetClass) {
 		// Don't allow no-public methods as required.
+		// 如果目标方法非public则直接返回null，表示非tx执行
+		// 下面的判断就是为什么非public方法tx不生效的原因！
 		if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
 			return null;
 		}
@@ -159,13 +172,18 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 
 		// First try is the method in the target class.
+		// 第一步，从目标方法中寻找tx属性
+		// 如果方法和类上都配置了tx，则以方法上的为准（因为第一步先找方法的tx属性，第二步才找类的tx属性）
 		TransactionAttribute txAttr = findTransactionAttribute(specificMethod);
+		// 找到就直接返回
 		if (txAttr != null) {
 			return txAttr;
 		}
 
 		// Second try is the transaction attribute on the target class.
+		// 第二步，从目标类上找tx属性
 		txAttr = findTransactionAttribute(specificMethod.getDeclaringClass());
+		// 找到就返回
 		if (txAttr != null && ClassUtils.isUserLevelMethod(method)) {
 			return txAttr;
 		}
