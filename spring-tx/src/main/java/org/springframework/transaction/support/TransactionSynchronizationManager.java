@@ -78,6 +78,8 @@ public abstract class TransactionSynchronizationManager {
 
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationManager.class);
 
+	// 这个ThreadLocal里保存的就是connectionHolder
+	// k -> dataSource, v -> connectionHolder
 	private static final ThreadLocal<Map<Object, Object>> resources =
 			new NamedThreadLocal<>("Transactional resources");
 
@@ -136,7 +138,9 @@ public abstract class TransactionSynchronizationManager {
 	 */
 	@Nullable
 	public static Object getResource(Object key) {
+		// 获取key -> dataSource
 		Object actualKey = TransactionSynchronizationUtils.unwrapResourceIfNecessary(key);
+		// 根据key获取value -> connectionHolder
 		Object value = doGetResource(actualKey);
 		if (value != null && logger.isTraceEnabled()) {
 			logger.trace("Retrieved value [" + value + "] for key [" + actualKey + "] bound to thread [" +
@@ -150,10 +154,12 @@ public abstract class TransactionSynchronizationManager {
 	 */
 	@Nullable
 	private static Object doGetResource(Object actualKey) {
+		// 从当前th中获取数据库连接的map
 		Map<Object, Object> map = resources.get();
 		if (map == null) {
 			return null;
 		}
+		// 根据dataSource获取connectionHolder
 		Object value = map.get(actualKey);
 		// Transparently remove ResourceHolder that was marked as void...
 		if (value instanceof ResourceHolder && ((ResourceHolder) value).isVoid()) {
@@ -164,6 +170,7 @@ public abstract class TransactionSynchronizationManager {
 			}
 			value = null;
 		}
+		// 返回connectionHolder
 		return value;
 	}
 
