@@ -1,7 +1,7 @@
 package com.joker.bean;
 
 
-public class Person  {
+public class Person {
 
 	private String name;
 
