@@ -25,6 +25,7 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 2.0
  */
+// 定义bean元数据的获取方法，bean元数据持有的配置元素可以通过下面的方法获取
 public interface BeanMetadataElement {
 
 	/**

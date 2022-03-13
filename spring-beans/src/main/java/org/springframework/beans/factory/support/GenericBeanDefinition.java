@@ -38,6 +38,7 @@ import org.springframework.util.ObjectUtils;
  * @see ChildBeanDefinition
  */
 @SuppressWarnings("serial")
+// 提供一站式服务
 public class GenericBeanDefinition extends AbstractBeanDefinition {
 
 	@Nullable
