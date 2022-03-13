@@ -75,12 +75,18 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 
 	/** Cache of singleton objects: bean name to bean instance. */
+	// 一级缓存，存放已经创建完毕的bean
+	// bean name -> bean instance
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name to ObjectFactory. */
+	// 三级缓存，存放半成品bean的factory
+	// bean name -> ObjectFactory
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance. */
+	// 二级缓存，存放半成品bean
+	// bean name -> bean instance
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
 	/** Set of registered singletons, containing the bean names in registration order. */
@@ -179,20 +185,33 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
+		// 首先尝试从一级缓存singletonObjects中获取
 		Object singletonObject = this.singletonObjects.get(beanName);
+		// 如果拿不到并且bean正在创建的话
+		// 正在创建意味着bean正在初始化但是还没有完成初始化
+		// Spring解决单例bean循环依赖问题的核心就在于将bean提前暴露
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+			// 一级缓存中没有，那么我们尝试从earlySingletonObjects二级缓存中获取
 			singletonObject = this.earlySingletonObjects.get(beanName);
+			// 如果earlySingletonObjects中没有，并且允许提前创建的话
+			// 那么我们需要从三级缓存singletonFactory中获取
 			if (singletonObject == null && allowEarlyReference) {
+				// 加锁
 				synchronized (this.singletonObjects) {
 					// Consistent creation of early reference within full singleton lock
 					singletonObject = this.singletonObjects.get(beanName);
 					if (singletonObject == null) {
 						singletonObject = this.earlySingletonObjects.get(beanName);
 						if (singletonObject == null) {
+							// 从三级缓存singletonFactories中获取对应的ObjectFactory
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 							if (singletonFactory != null) {
+								// 如果能够从三级缓存中获取到
 								singletonObject = singletonFactory.getObject();
+								// 那么将其添加到earlySingletonObjects二级缓存中
+								// 这就是二级缓存存在的意义：从三级缓存的getObject()中获取执行结果，提前暴露单例bean对象
 								this.earlySingletonObjects.put(beanName, singletonObject);
+								// 并从三级缓存singletonFactories中移除相应的ObjectFactory
 								this.singletonFactories.remove(beanName);
 							}
 						}

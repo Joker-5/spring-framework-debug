@@ -13,8 +13,5 @@ public class MainTest {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
 		Person bean = context.getBean(Person.class);
 		System.out.println(bean);
-		HashSet<Integer> set = new HashSet<>();
-		set.add(1);
-
 	}
 }
