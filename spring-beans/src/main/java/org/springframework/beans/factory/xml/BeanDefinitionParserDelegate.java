@@ -484,9 +484,17 @@ public class BeanDefinitionParserDelegate {
 			// 对bean标签的所有属性进行解析
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
-
+			// 对<meta>元数据进行解析
 			parseMetaElements(ele, bd);
+			// 对<lookup-method>进行解析
+			// Spring动态改变bean里方法的实现。方法执行返回的对象，使用Spring内原有的这类对象替换，通过改变方法返回值来动态改变方法。
+			// 内部实现为使用cglib代理，重新生成子类，重写配置的方法和返回对象，达到动态改变的效果
+			// 主要用于设计一些可插拔的功能，解决程序依赖
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			// 对<replace-method>进行解析
+			// Spring 动态改变 bean 里方法的实现。需要改变的方法，
+			// 使用 Spring 内原有其他类（需要继承接口org.springframework.beans.factory.support.MethodReplacer）的逻辑，
+			// 替换这个方法。通过改变方法执行逻辑来动态改变方法。
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
 			parseConstructorArgElements(ele, bd);
@@ -616,12 +624,15 @@ public class BeanDefinitionParserDelegate {
 	 */
 	public void parseMetaElements(Element ele, BeanMetadataAttributeAccessor attributeAccessor) {
 		NodeList nl = ele.getChildNodes();
+		// 对子节点进行遍历
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 标签名为<meta>
 			if (isCandidateElement(node) && nodeNameEquals(node, META_ELEMENT)) {
 				Element metaElement = (Element) node;
 				String key = metaElement.getAttribute(KEY_ATTRIBUTE);
 				String value = metaElement.getAttribute(VALUE_ATTRIBUTE);
+				// 创建BeanMetadataAttribute对象，并将其添加到BeanMetadataAttributeAccessor中
 				BeanMetadataAttribute attribute = new BeanMetadataAttribute(key, value);
 				attribute.setSource(extractSource(metaElement));
 				attributeAccessor.addMetadataAttribute(attribute);
