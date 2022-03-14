@@ -476,7 +476,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
-			// 创建bean实例
+			// 创建bean实例的核心方法，执行真正的创建bean实例操作
 			Object beanInstance = doCreateBean(beanName, mbdToUse, args);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Finished creating instance of bean '" + beanName + "'");
@@ -508,6 +508,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #instantiateUsingFactoryMethod
 	 * @see #autowireConstructor
 	 */
+	// 总结
+	// Spring有4种创建bean的方式：
+	// 1）Supplier回调
+	// 2）工厂方法初始化，比较复杂
+	// 3）构造器自动注入，比较复杂
+	// 4）默认构造器注入
+	// 2和3之所以复杂，是因为确定构造器和构造器参数需要耗费大量精力去处理，这些确定了后面的自然就好说了
 	protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
 			throws BeanCreationException {
 
@@ -1303,9 +1310,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param mbd the bean definition for the bean
 	 * @return a BeanWrapper for the new instance
 	 */
+	// 用默认构造器来实例化bean
 	protected BeanWrapper instantiateBean(String beanName, RootBeanDefinition mbd) {
+		// 按照指定策略实例化bean，并将其包装到BeanWrapper中
 		try {
 			Object beanInstance;
+			// 安全模式
 			if (System.getSecurityManager() != null) {
 				beanInstance = AccessController.doPrivileged(
 						(PrivilegedAction<Object>) () -> getInstantiationStrategy().instantiate(mbd, beanName, this),
