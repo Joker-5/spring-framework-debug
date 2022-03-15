@@ -558,15 +558,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
 		// 重点，解决单例的循环依赖问题
-		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
-				// 当前单例bean是否正在被创建
-				isSingletonCurrentlyInCreation(beanName));
+		// 下面的代码指明什么时候一个bean会被加入到三级缓存中：
+		// 1) 单例
+		// 2) 允许将bean提前暴露
+		// 3) 当前bean正在创建中
+		boolean earlySingletonExposure = (mbd.isSingleton() // 单例模式
+				&& this.allowCircularReferences // 允许循环依赖
+				&& isSingletonCurrentlyInCreation(beanName)); // 当前bean正在被创建
 		if (earlySingletonExposure) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			// 提前将创建的bean加入到singletonFactory中，提前暴露对象
+			// 提前将创建的bean加入到singletonFactory中，提前暴露对象，解决循环依赖
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
@@ -944,6 +948,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param bean the raw bean instance
 	 * @return the object to expose as bean reference
 	 */
+	// 对创建的半成品bean的引用进行处理
+	// AOP在这里可以进行动态织入，创建其代理bean并返回
+	// 这也是Spring需要三级而不是二级缓存的原因：
+	// 如果bean在循环依赖时存在动态代理的情况，如果不引入三级缓存，
+	// 那么循环注入时注入到的别人的bean就是原始的bean，而不是经过动态代理的bean
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
 		Object exposedObject = bean;
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
