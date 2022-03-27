@@ -51,6 +51,7 @@ import org.springframework.core.io.ResourceLoader;
  * @see org.springframework.context.ApplicationContext
  * @see org.springframework.context.ResourceLoaderAware
  */
+// ResourceLoader的扩展，支持根据给定的资源路径匹配模式返回多个resource实例
 public interface ResourcePatternResolver extends ResourceLoader {
 
 	/**
@@ -71,6 +72,7 @@ public interface ResourcePatternResolver extends ResourceLoader {
 	 * @return the corresponding Resource objects
 	 * @throws IOException in case of I/O errors
 	 */
+	// 按照匹配模式返回多个Resource实例
 	Resource[] getResources(String locationPattern) throws IOException;
 
 }

@@ -61,6 +61,8 @@ public class DefaultResourceLoader implements ResourceLoader {
 	 * at the time of this ResourceLoader's initialization.
 	 * @see java.lang.Thread#getContextClassLoader()
 	 */
+	// 无参构造，使用默认的ClassLoader
+	// 一般是用Thread.currentThread()#getContextClassLoader()来获取
 	public DefaultResourceLoader() {
 		this.classLoader = ClassUtils.getDefaultClassLoader();
 	}
@@ -70,6 +72,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	 * @param classLoader the ClassLoader to load class path resources with, or {@code null}
 	 * for using the thread context class loader at the time of actual resource access
 	 */
+	// 有参构造，用指定ClassLoader加载
 	public DefaultResourceLoader(@Nullable ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
@@ -141,22 +144,26 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 
 	@Override
+	// 核心方法，整个ResourceLoader体系下的核心实现
+	// 其子类并没有覆盖该方法，也是利用其来获取资源
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
-
+		// 首先通过ProtocolResolver来加载资源，加载成功就直接返回
 		for (ProtocolResolver protocolResolver : getProtocolResolvers()) {
 			Resource resource = protocolResolver.resolve(location, this);
 			if (resource != null) {
 				return resource;
 			}
 		}
-
+		// 如果以"/"开头，则返回ClassPathContextResource类型的资源
 		if (location.startsWith("/")) {
 			return getResourceByPath(location);
 		}
+		// 如果以"classpath:"开头，返回ClassPathResource类型资源
 		else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
 		}
+		// 根据是否是文件URL，来决定返回FileUrlResource还是UrlResource类型的资源
 		else {
 			try {
 				// Try to parse the location as a URL...
@@ -165,6 +172,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 			}
 			catch (MalformedURLException ex) {
 				// No URL -> resolve as resource path.
+				// 兜底，返回ClassPathContextResource类型资源
 				return getResourceByPath(location);
 			}
 		}
@@ -181,6 +189,8 @@ public class DefaultResourceLoader implements ResourceLoader {
 	 * @see org.springframework.context.support.FileSystemXmlApplicationContext#getResourceByPath
 	 * @see org.springframework.web.context.support.XmlWebApplicationContext#getResourceByPath
 	 */
+	// 通常我们需要的是FileSystemContextResource而不是ClassPathContextResource
+	// 因此可以使用子类FileSystemResourceLoader的重写方法
 	protected Resource getResourceByPath(String path) {
 		return new ClassPathContextResource(path, getClassLoader());
 	}

@@ -49,6 +49,8 @@ import org.springframework.lang.Nullable;
  * @see ByteArrayResource
  * @see InputStreamResource
  */
+// Resource是Spring框架所有资源的抽象和访问接口
+// 作为所有资源的统一抽象，其定义了一些通用方法
 public interface Resource extends InputStreamSource {
 
 	/**
@@ -57,6 +59,7 @@ public interface Resource extends InputStreamSource {
 	 * existence of a {@code Resource} handle only guarantees a valid
 	 * descriptor handle.
 	 */
+	// 资源是否存在
 	boolean exists();
 
 	/**
@@ -70,6 +73,7 @@ public interface Resource extends InputStreamSource {
 	 * @see #getInputStream()
 	 * @see #exists()
 	 */
+	// 资源是否可读
 	default boolean isReadable() {
 		return exists();
 	}
@@ -80,6 +84,7 @@ public interface Resource extends InputStreamSource {
 	 * and must be read and closed to avoid resource leaks.
 	 * <p>Will be {@code false} for typical resource descriptors.
 	 */
+	// 资源的句柄是否被stream打开
 	default boolean isOpen() {
 		return false;
 	}
@@ -92,6 +97,7 @@ public interface Resource extends InputStreamSource {
 	 * @since 5.0
 	 * @see #getFile()
 	 */
+	// 判断是否是File
 	default boolean isFile() {
 		return false;
 	}
@@ -140,6 +146,7 @@ public interface Resource extends InputStreamSource {
 	 * @throws IOException if the resource cannot be resolved
 	 * (in the file system or as some other known physical resource type)
 	 */
+	// 获取资源内容的长度
 	long contentLength() throws IOException;
 
 	/**
@@ -147,6 +154,7 @@ public interface Resource extends InputStreamSource {
 	 * @throws IOException if the resource cannot be resolved
 	 * (in the file system or as some other known physical resource type)
 	 */
+	// 资源最后修改的时间
 	long lastModified() throws IOException;
 
 	/**
@@ -155,6 +163,7 @@ public interface Resource extends InputStreamSource {
 	 * @return the resource handle for the relative resource
 	 * @throws IOException if the relative resource cannot be determined
 	 */
+	// 根据资源相对路径创建新资源
 	Resource createRelative(String relativePath) throws IOException;
 
 	/**

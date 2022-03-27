@@ -30,6 +30,9 @@ import org.springframework.lang.Nullable;
  * @see DefaultResourceLoader#addProtocolResolver
  */
 @FunctionalInterface
+// 用户自定义的协议资源解析器
+// 作为DefaultResourceLoader的SPI，其允许用户自定义资源加载协议，而不需要继承ResourceLoader的子类
+// 这个接口是没有实现类的，因此需要用户进行自定义
 public interface ProtocolResolver {
 
 	/**
@@ -41,6 +44,8 @@ public interface ProtocolResolver {
 	 * matches this resolver's protocol, or {@code null} otherwise
 	 */
 	@Nullable
+	// 全局只有一个方法，使用指定的ResourceLoader来解析指定location的资源
+	// 如果成功的话就返回相应的Resource
 	Resource resolve(String location, ResourceLoader resourceLoader);
 
 }
