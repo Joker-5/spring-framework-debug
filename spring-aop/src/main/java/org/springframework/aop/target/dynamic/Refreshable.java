@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,31 @@
  * limitations under the License.
  */
 
-package org.springframework.beans;
-
-import org.springframework.lang.Nullable;
+package org.springframework.aop.target.dynamic;
 
 /**
- * Interface to be implemented by bean metadata elements
- * that carry a configuration source object.
+ * Interface to be implemented by dynamic target objects,
+ * which support reloading and optionally polling for updates.
  *
- * @author Juergen Hoeller
+ * @author Rod Johnson
+ * @author Rob Harrop
  * @since 2.0
  */
-// 定义bean元数据的获取方法，bean元数据持有的配置元素可以通过下面的方法获取
-public interface BeanMetadataElement {
+public interface Refreshable {
 
 	/**
-	 * Return the configuration source {@code Object} for this metadata element
-	 * (may be {@code null}).
+	 * Refresh the underlying target object.
 	 */
-	@Nullable
-	default Object getSource() {
-		return null;
-	}
+	void refresh();
+
+	/**
+	 * Return the number of actual refreshes since startup.
+	 */
+	long getRefreshCount();
+
+	/**
+	 * Return the last time an actual refresh happened (as timestamp).
+	 */
+	long getLastRefreshTime();
 
 }

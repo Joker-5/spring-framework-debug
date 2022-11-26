@@ -16,28 +16,19 @@
 
 package org.springframework.beans.factory.support;
 
-import java.beans.PropertyDescriptor;
-import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Set;
-
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.reflect.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Set;
 
 /**
  * Utility class that contains various methods useful for the implementation of
@@ -50,7 +41,9 @@ import org.springframework.util.ClassUtils;
  * @see AbstractAutowireCapableBeanFactory
  */
 abstract class AutowireUtils {
-
+	// 构造器排序规则：
+	// 1）是否是public的构造器
+	// 2）如果都是public的话则根据形参数量进行降序排序
 	public static final Comparator<Executable> EXECUTABLE_COMPARATOR = (e1, e2) -> {
 		int result = Boolean.compare(Modifier.isPublic(e2.getModifiers()), Modifier.isPublic(e1.getModifiers()));
 		return result != 0 ? result : Integer.compare(e2.getParameterCount(), e1.getParameterCount());

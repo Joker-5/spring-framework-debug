@@ -34,6 +34,7 @@ import org.springframework.lang.Nullable;
  * @since 13 May 2001
  * @see PropertyValue
  */
+// 用于描述bean的属性
 public interface PropertyValues extends Iterable<PropertyValue> {
 
 	/**

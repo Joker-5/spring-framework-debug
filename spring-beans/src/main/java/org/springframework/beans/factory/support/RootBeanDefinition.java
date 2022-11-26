@@ -16,15 +16,6 @@
 
 package org.springframework.beans.factory.support;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -32,6 +23,11 @@ import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.lang.reflect.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * A root bean definition represents the merged bean definition that backs
@@ -52,6 +48,8 @@ import org.springframework.util.Assert;
  * @see ChildBeanDefinition
  */
 @SuppressWarnings("serial")
+// 如果配置文件中定义了父<bean>和子<bean>
+// 父<bean>用RootBeanDefinition来表示
 public class RootBeanDefinition extends AbstractBeanDefinition {
 
 	@Nullable
@@ -91,17 +89,21 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	volatile String resolvedDestroyMethodName;
 
 	/** Common lock for the four constructor fields below. */
+	// 构造器的缓存锁
 	final Object constructorArgumentLock = new Object();
 
 	/** Package-visible field for caching the resolved constructor or factory method. */
 	@Nullable
+	// 缓存已解析的构造器或工厂方法
 	Executable resolvedConstructorOrFactoryMethod;
 
 	/** Package-visible field that marks the constructor arguments as resolved. */
+	// 用于标记构造器参数是否已经解析完毕
 	boolean constructorArgumentsResolved = false;
 
 	/** Package-visible field for caching fully resolved constructor arguments. */
 	@Nullable
+	// 缓存已解析的构造器参数
 	Object[] resolvedConstructorArguments;
 
 	/** Package-visible field for caching partly prepared constructor arguments. */

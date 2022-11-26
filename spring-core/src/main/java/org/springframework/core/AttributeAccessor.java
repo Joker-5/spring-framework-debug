@@ -25,6 +25,8 @@ import org.springframework.lang.Nullable;
  * @author Rob Harrop
  * @since 2.0
  */
+// 定义了与其他对象的元数据进行连接和访问的约定
+// i.e.对属性的修改，获取，设置，删除
 public interface AttributeAccessor {
 
 	/**

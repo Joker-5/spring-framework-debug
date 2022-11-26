@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
  * @see Class#getResource(String)
  * @see ClassPathResource#ClassPathResource(String, Class)
  */
+// 可以根据给定class所在的包或者子包下加载资源
 public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 
 	private final Class<?> clazz;

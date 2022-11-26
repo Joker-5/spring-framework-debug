@@ -363,6 +363,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	 * this point; it just allows discovery to happen when the application calls
 	 * {@link #getDependencyName()} (if ever).
 	 */
+	// 初始化参数名称发现器，该方法并不会在此时就尝试检索参数名称，就是个简单的赋值操作
 	public void initParameterNameDiscovery(@Nullable ParameterNameDiscoverer parameterNameDiscoverer) {
 		if (this.methodParameter != null) {
 			this.methodParameter.initParameterNameDiscovery(parameterNameDiscoverer);
