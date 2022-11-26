@@ -216,6 +216,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
+			// 可以获取到，则走下面这条逻辑
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 		// 如果拿不到就尝试进行创建
@@ -257,6 +258,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				checkMergedBeanDefinition(mbd, beanName, args);
 
 				// Guarantee initialization of beans that the current bean depends on.
+				// 如果有 @DependsOn 标记，则先创建 dependsOn 的 Bean
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
@@ -278,9 +280,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// Create bean instance.
 				// 单例对象创建
 				if (mbd.isSingleton()) {
+					// 开始创建 Bean
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
-							// 创建bean的核心方法
+							// 创建 Bean 的核心方法
 							return createBean(beanName, mbd, args);
 						}
 						catch (BeansException ex) {
@@ -1751,7 +1754,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected Object getObjectForBeanInstance(
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
-
+		// 如果是工厂类，且 beanName 不以&开头，则调用工厂类的 getObject()，
+		// 其他情况则返回原对象
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
