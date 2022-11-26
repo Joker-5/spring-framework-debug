@@ -55,7 +55,12 @@ import org.springframework.core.type.filter.TypeFilter;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
+// @Repeatable 表示 @ComponentScan 这个注解是可重复的，
+// 即一个类上可以同时写多个@ComponentScan，
+// 而且可以等价替换成一个 @ComponentScans 注解
 @Repeatable(ComponentScans.class)
+// 用于声明要扫描 Bean 的包路径，将指定路径下的所有 Bean 扫描到，
+// 具体逻辑由 ComponentScanAnnotationParser#parse 实现
 public @interface ComponentScan {
 
 	/**
@@ -64,6 +69,7 @@ public @interface ComponentScan {
 	 * are needed &mdash; for example, {@code @ComponentScan("org.my.pkg")}
 	 * instead of {@code @ComponentScan(basePackages = "org.my.pkg")}.
 	 */
+	// 指定 Bean 的包扫描路径，同 basePackages
 	@AliasFor("basePackages")
 	String[] value() default {};
 
