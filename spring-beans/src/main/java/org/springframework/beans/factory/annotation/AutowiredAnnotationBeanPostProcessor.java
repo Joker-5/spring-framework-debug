@@ -259,6 +259,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			throws BeanCreationException {
 
 		// Let's check for lookup methods here...
+		// 判断方法是否被 @Lookup 注解修饰
 		if (!this.lookupMethodsChecked.contains(beanName)) {
 			if (AnnotationUtils.isCandidateClass(beanClass, Lookup.class)) {
 				try {
@@ -272,6 +273,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 								try {
 									RootBeanDefinition mbd = (RootBeanDefinition)
 											this.beanFactory.getMergedBeanDefinition(beanName);
+									// 将相应方法添加到 methodOverrides 属性中
 									mbd.getMethodOverrides().addOverride(override);
 								}
 								catch (NoSuchBeanDefinitionException ex) {
