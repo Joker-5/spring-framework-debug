@@ -175,6 +175,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Override
 	@Nullable
 	public Object getSingleton(String beanName) {
+		// 第二个形参为 true 表示允许早期引用
 		return getSingleton(beanName, true);
 	}
 
