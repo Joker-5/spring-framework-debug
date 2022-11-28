@@ -100,7 +100,7 @@ class ConstructorResolver {
 	// 核心就是：首先确定构造函数参数、构造函数，然后调用相应的初始化策略进行bean的初始化
 	public BeanWrapper autowireConstructor(String beanName, RootBeanDefinition mbd,
 			@Nullable Constructor<?>[] chosenCtors, @Nullable Object[] explicitArgs) {
-		// 封装BeanWrapperImpl对象并初始化
+		// 封装 BeanWrapperImpl 对象并初始化
 		BeanWrapperImpl bw = new BeanWrapperImpl();
 		this.beanFactory.initBeanWrapper(bw);
 		// 获得一系列需要的参数
@@ -198,7 +198,7 @@ class ConstructorResolver {
 				if (parameterCount < minNrOfArgs) {
 					continue;
 				}
-
+				// 构造器需要的参数
 				ArgumentsHolder argsHolder;
 				// 获取构造器参数类型
 				Class<?>[] paramTypes = candidate.getParameterTypes();
@@ -211,6 +211,8 @@ class ConstructorResolver {
 								paramNames = pnd.getParameterNames(candidate);
 							}
 						}
+						// 获取构造器参数，因为 Spring 不会直接显式使用 new 关键字来创建实例，因此只能是去寻找依赖来作为构造器调用参数，
+						// 详细看下下面的 createArgumentArray() 就知道，他最终是从 BeanFactory 中获取 Bean 作为构造器参数的
 						argsHolder = createArgumentArray(beanName, mbd, resolvedValues, bw, paramTypes, paramNames,
 								getUserDeclaredConstructor(candidate), autowiring, candidates.length == 1);
 					}
@@ -278,7 +280,7 @@ class ConstructorResolver {
 		}
 
 		Assert.state(argsToUse != null, "Unresolved constructor arguments");
-		// 实例化bean
+		// 实例化 Bean，核心方法就是下面的 instantiate()
 		bw.setBeanInstance(instantiate(beanName, mbd, constructorToUse, argsToUse));
 		return bw;
 	}

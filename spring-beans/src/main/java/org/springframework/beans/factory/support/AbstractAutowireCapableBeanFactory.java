@@ -1185,14 +1185,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) {
 		// Make sure bean class is actually resolved at this point.
-		// 解析bean，将bean类名解析为class引用
+		// 解析 Bean，将 Bean 类名解析为class引用
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
 
 		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
 			throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
 		}
-		// 如果设置了Supplier回调函数，则直接使用给定的回调方法进行实例化
+		// 如果设置了 Supplier 回调函数，则直接使用给定的回调方法进行实例化
 		Supplier<?> instanceSupplier = mbd.getInstanceSupplier();
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
@@ -1227,11 +1227,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Candidate constructors for autowiring?
-		// 确定解析的构造器，主要是检查已注册的SmartInstantiationAwareBeanPostProcessor
+		// 获取解析 Bean 使用的构造器，主要是检查已注册的 SmartInstantiationAwareBeanPostProcessor
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
-		// 在有参情况下，利用已知条件（参数格式、类型等），匹配最精确的构造器来创建bean
+		// 在有参情况下，利用已知条件（参数格式、类型等），匹配最精确的构造器来创建 Bean
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
+			// 利用反射创建 Bean
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
