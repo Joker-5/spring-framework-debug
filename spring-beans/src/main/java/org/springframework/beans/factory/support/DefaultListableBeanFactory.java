@@ -1218,16 +1218,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
 		// 初始化参数名称发现器，该方法并不会在此时就尝试检索参数名称
 		descriptor.initParameterNameDiscovery(getParameterNameDiscoverer());
-		// 依赖类型为Optional
+		// 依赖类型为 Optional
 		if (Optional.class == descriptor.getDependencyType()) {
 			return createOptionalDependency(descriptor, requestingBeanName);
 		}
-		// 依赖类型为ObjectFactory、ObjectProvider
+		// 依赖类型为 ObjectFactory、ObjectProvider
 		else if (ObjectFactory.class == descriptor.getDependencyType() ||
 				ObjectProvider.class == descriptor.getDependencyType()) {
 			return new DependencyObjectProvider(descriptor, requestingBeanName);
 		}
-		// 依赖类型为javaxInjectProviderClass，特殊处理
+		// 依赖类型为 javaxInjectProviderClass，特殊处理
 		else if (javaxInjectProviderClass == descriptor.getDependencyType()) {
 			return new Jsr330Factory().createDependencyProvider(descriptor, requestingBeanName);
 		}
@@ -1236,7 +1236,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			Object result = getAutowireCandidateResolver().getLazyResolutionProxyIfNecessary(
 					descriptor, requestingBeanName);
 			if (result == null) {
-				// 通用逻辑处理
+				// 通用逻辑处理，解析依赖
 				result = doResolveDependency(descriptor, requestingBeanName, autowiredBeanNames, typeConverter);
 			}
 			return result;
@@ -1283,7 +1283,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (multipleBeans != null) {
 				return multipleBeans;
 			}
-			// 查找与类型向匹配的bean
+			// 查找与依赖类型相匹配的 Bean
 			// <k:匹配的beanName, v:对应的实例化bean>
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, type, descriptor);
 			// 如果没有找到需要检验@Autowire的require是否为true，如果是的话就需要抛异常
@@ -1298,11 +1298,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			Object instanceCandidate;
 
 			if (matchingBeans.size() > 1) {
-				// 确定给定bean autowire的候选者
+				// 如果有找到多个候选依赖，需要选出优先级最高的依赖进行注入
 				autowiredBeanName = determineAutowireCandidate(matchingBeans, descriptor);
 				if (autowiredBeanName == null) {
+					// 保证依赖注入的唯一性，
+					// 如果经过 determineAutowireCandidate() 没找到合适的注入，
+					// 则需要进一步判断当前属性：必须注入成功 or 不接受多 Bean 类型(即不是数组、集合、Map类型)
+					// 一旦有一个条件不满足就直接报错，
+					// 下面是非常经典的报错：expected single matching bean but found 2(多个)
 					if (isRequired(descriptor) || !indicatesMultipleBeans(type)) {
-						// 唯一性处理
 						return descriptor.resolveNotUnique(descriptor.getResolvableType(), matchingBeans);
 					}
 					else {
@@ -1568,18 +1572,25 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 * @return the name of the autowire candidate, or {@code null} if none found
 	 */
 	@Nullable
-	// 按照@Primary和@Priority的顺序确定bean的autowire的候选者
+	// 选出优先级最高的依赖，选择优先级由高到低为：
+	// 1）@Primary
+	// 2）@Priority
+	// 3）按照 BeanName 精确匹配
+	// 如果经过这三个步骤没找到就返回空
 	protected String determineAutowireCandidate(Map<String, Object> candidates, DependencyDescriptor descriptor) {
 		Class<?> requiredType = descriptor.getDependencyType();
+		// 1.@Primary
 		String primaryCandidate = determinePrimaryCandidate(candidates, requiredType);
 		if (primaryCandidate != null) {
 			return primaryCandidate;
 		}
+		// 2.@Priority
 		String priorityCandidate = determineHighestPriorityCandidate(candidates, requiredType);
 		if (priorityCandidate != null) {
 			return priorityCandidate;
 		}
 		// Fallback
+		// 3.按照 BeanName 精确匹配
 		for (Map.Entry<String, Object> entry : candidates.entrySet()) {
 			String candidateName = entry.getKey();
 			Object beanInstance = entry.getValue();
@@ -1588,6 +1599,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				return candidateName;
 			}
 		}
+		// 4.没找到，返回空
 		return null;
 	}
 
