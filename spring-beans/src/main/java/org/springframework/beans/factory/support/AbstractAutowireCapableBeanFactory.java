@@ -530,6 +530,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	// 3）构造器自动注入，比较复杂
 	// 4）默认构造器注入
 	// 2和3之所以复杂，是因为确定构造器和构造器参数需要耗费大量精力去处理，这些确定了后面的自然就好说了
+	
+	// Bean 的创建可以划分为三个基本步骤：
+	// 1）Bean 实例化，相当于给 Bean 开一块内存
+	// 2）Bean 属性填充，给 Bean 中的各种属性进行依赖注入，这个过程其实就是在 IoC 容器中寻找属性是否有对应的 Bean 依赖，
+	// 如果有就注入到当前 bean 的相应属性中
+	// 3）Bean 初始化
 	protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
 			throws BeanCreationException {
 
@@ -1431,9 +1437,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// state of the bean before properties are set. This can be used, for example,
 		// to support styles of field injection.
 		// 在设置属性前给InstantiationAwareBeanPostProcessors最后一次改变bean的机会
-		// 第一个判断条件是判断bean是否是合成的，即是否未由应用程序本身定义
+		// 第一个判断条件是判断 Bean 是否是合成的，即是否未由应用程序本身定义
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
-			// 遍历所有BeanPostProcessor进行处理
+			// 遍历所有 Bean 后置处理器，判断是否允许后续的属性填充操作
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
@@ -1446,6 +1452,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 		}
+		// 走到这里就正式进入 Bean 属性填充流程了
 		// 获取 Bean 属性值
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 		// 获取自动注入(装配)的模式，默认是 AUTOWIRE_NO，即不进行自动装配
@@ -1467,7 +1474,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			pvs = newPvs;
 		}
-		// 判断是否已经注册了InstantiationAwareBeanPostProcessors
+		// 判断是否已经注册了 InstantiationAwareBeanPostProcessors
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		// 判断是否需要进行依赖检查
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
@@ -1481,9 +1488,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
 					// 第六次调用 Bean 后置处理器，取出第四次调用处理器解析出的元数据进行属性或方法装配，
-					// 可以看下子类该方法的具体实现，不同子类负责处理不同注解的装配，
+					// 可以看下子类该方法的具体实现，不同子类负责处理不同注解的自动装配，
 					// 比如 CommonAnnotationBeanPostProcessor 子类负责处理用 @Resource 注解的装配；
 					// AutowiredAnnotationBeanPostProcessor 子类负责处理用 @Autowired、@Value、@Inject 注解的装配
+					// 具体的装配细节可以到子类里面去了解下
 					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						// 从bw对象中提取属性
