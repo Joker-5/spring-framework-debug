@@ -154,6 +154,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
 		try {
+			// 调用初始化方法来对 Bean 初始化
 			metadata.invokeInitMethods(bean, beanName);
 		}
 		catch (InvocationTargetException ex) {
@@ -196,6 +197,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 	}
 
 
+	// 获取被 @PostConstruct 和 @PreDestroy 注解修饰的方法
 	private LifecycleMetadata findLifecycleMetadata(Class<?> clazz) {
 		if (this.lifecycleMetadataCache == null) {
 			// Happens after deserialization, during destruction...
@@ -216,6 +218,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 		return metadata;
 	}
 
+	// 获取被 @PostConstruct 和 @PreDestroy 注解修饰的方法
 	private LifecycleMetadata buildLifecycleMetadata(final Class<?> clazz) {
 		if (!AnnotationUtils.isCandidateClass(clazz, Arrays.asList(this.initAnnotationType, this.destroyAnnotationType))) {
 			return this.emptyLifecycleMetadata;
@@ -230,6 +233,8 @@ public class InitDestroyAnnotationBeanPostProcessor
 			final List<LifecycleElement> currDestroyMethods = new ArrayList<>();
 
 			ReflectionUtils.doWithLocalMethods(targetClass, method -> {
+				// 这里的 this.initAnnotationType 就是 PostConstruct.class，
+				// 点进 initAnnotationType 的 setter 方法就可以看到
 				if (this.initAnnotationType != null && method.isAnnotationPresent(this.initAnnotationType)) {
 					LifecycleElement element = new LifecycleElement(method);
 					currInitMethods.add(element);
@@ -237,6 +242,8 @@ public class InitDestroyAnnotationBeanPostProcessor
 						logger.trace("Found init method on class [" + clazz.getName() + "]: " + method);
 					}
 				}
+				// 这里的 this.destroyAnnotationType 就是 PreDestroy.class，
+				// 点进 destroyAnnotationType 的 setter 方法就可以看到
 				if (this.destroyAnnotationType != null && method.isAnnotationPresent(this.destroyAnnotationType)) {
 					currDestroyMethods.add(new LifecycleElement(method));
 					if (logger.isTraceEnabled()) {
@@ -384,6 +391,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 			return this.identifier;
 		}
 
+		// 利用反射调用方法执行
 		public void invoke(Object target) throws Throwable {
 			ReflectionUtils.makeAccessible(this.method);
 			this.method.invoke(target, (Object[]) null);

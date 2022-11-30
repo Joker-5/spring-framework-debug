@@ -1918,7 +1918,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// 调用用户自定义的 init 方法，
 			// 如果 Bean 实现了 InitializingBean 接口，则调用 afterPropertiesSet() 方法，
 			// 如果这个 Bean 还实现了自定义的初始化方法，也在下面的方法中调用，
-			// 执行顺序是先 afterPropertiesSet() 后用户自定义的方法
+			// 执行顺序是先执行 afterPropertiesSet() ，后用户自定义的方法
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		} catch (Throwable ex) {
 			throw new BeanCreationException(
@@ -1970,7 +1970,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	// 后进行<init-method>的自定义方法
 	protected void invokeInitMethods(String beanName, Object bean, @Nullable RootBeanDefinition mbd)
 			throws Throwable {
-		// 先检查是否是InitializingBean
+		// 先检查是否是 InitializingBean 接口的实现
 		boolean isInitializingBean = (bean instanceof InitializingBean);
 		if (isInitializingBean && (mbd == null || !mbd.isExternallyManagedInitMethod("afterPropertiesSet"))) {
 			if (logger.isTraceEnabled()) {
