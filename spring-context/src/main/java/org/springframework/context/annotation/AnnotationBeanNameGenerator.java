@@ -76,7 +76,9 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 
 
 	@Override
+	// 基于注解的 BeanName 生成方法
 	public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
+		// 1.显式指定了 BeanName，直接用就行
 		if (definition instanceof AnnotatedBeanDefinition) {
 			String beanName = determineBeanNameFromAnnotation((AnnotatedBeanDefinition) definition);
 			if (StringUtils.hasText(beanName)) {
@@ -85,6 +87,7 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 			}
 		}
 		// Fallback: generate a unique default bean name.
+		// 2.没有指定，则生成一个默认 BeanName(最常见)
 		return buildDefaultBeanName(definition, registry);
 	}
 
@@ -163,10 +166,15 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	 * @param definition the bean definition to build a bean name for
 	 * @return the default bean name (never {@code null})
 	 */
+	// 生成默认的 BeanName
 	protected String buildDefaultBeanName(BeanDefinition definition) {
+		// 1.获取 Bean 的 ClassName
 		String beanClassName = definition.getBeanClassName();
 		Assert.state(beanClassName != null, "No bean class name set");
+		// 2.精简化 BeanName
 		String shortClassName = ClassUtils.getShortName(beanClassName);
+		// 3.1.如果首字母和第二个字母都是大写，不做变化直接返回，形如 SQLiteDataService 类这种的默认 BeanName 就是 SQLiteDataService
+		// 3.2.其他情况则将首字母变成小写并返回，形如 CassandraDataService 类这种的默认 BeanName 就是 cassandraDataService
 		return Introspector.decapitalize(shortClassName);
 	}
 
