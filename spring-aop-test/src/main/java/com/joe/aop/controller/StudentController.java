@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ import javax.annotation.Resource;
 @Validated
 public class StudentController {
 	@Autowired
-	@Qualifier("SQLiteDataService")
+	@Qualifier("studentController.InnerClassDataService")
 	private DataService dataService;
 
 	@GetMapping(path = "students/{id}")
@@ -27,5 +28,12 @@ public class StudentController {
 		dataService.deleteStudent(id);
 	}
 
-	;
+	@Repository
+	public static class InnerClassDataService implements DataService {
+
+		@Override
+		public void deleteStudent(int id) {
+
+		}
+	}
 }

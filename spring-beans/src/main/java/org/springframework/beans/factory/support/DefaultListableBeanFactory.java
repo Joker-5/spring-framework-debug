@@ -1258,15 +1258,21 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			// 获取依赖类型
 			Class<?> type = descriptor.getDependencyType();
-			// @Value注解
+			// @ Value 注解是如何工作的：
+			// 1.寻找 @Value 注解
 			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 			if (value != null) {
 				if (value instanceof String) {
+					// 2.解析嵌入 @Value 的字符串的值
 					String strVal = resolveEmbeddedValue((String) value);
 					BeanDefinition bd = (beanName != null && containsBean(beanName) ?
 							getMergedBeanDefinition(beanName) : null);
 					value = evaluateBeanDefinitionString(strVal, bd);
 				}
+				// 3.将 @Value 解析的结果转换为要装配的对象的类型
+				// 拿到第二步生成的结果后，我们会发现可能和我们要装配的类型不匹配。
+				// 假设我们定义的是 UUID，而我们获取的结果是一个字符串，那么这个时候就会根据目标类型来寻找转化器执行转化，
+				// 字符串到 UUID 的转化实际上发生在 UUIDEditor 中
 				TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
 				try {
 					return converter.convertIfNecessary(value, type, descriptor.getTypeDescriptor());

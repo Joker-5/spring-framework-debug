@@ -874,12 +874,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	@Override
 	@Nullable
+	// 解析嵌入 @Value 的字符串的值
 	public String resolveEmbeddedValue(@Nullable String value) {
 		if (value == null) {
 			return null;
 		}
 		String result = value;
 		for (StringValueResolver resolver : this.embeddedValueResolvers) {
+			// 执行解析
 			result = resolver.resolveStringValue(result);
 			if (result == null) {
 				return null;
