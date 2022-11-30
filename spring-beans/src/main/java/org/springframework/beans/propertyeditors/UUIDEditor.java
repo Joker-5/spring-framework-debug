@@ -34,6 +34,7 @@ public class UUIDEditor extends PropertyEditorSupport {
 	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		if (StringUtils.hasText(text)) {
+			// 将 String 类型转换为 UUID 类型
 			setValue(UUID.fromString(text.trim()));
 		}
 		else {

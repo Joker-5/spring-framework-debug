@@ -88,6 +88,7 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 						value = resolveNestedPlaceholders((String) value);
 					}
 					logKeyFound(key, propertySource, value);
+					// 注意是找到一个值就立即退出
 					return convertValueIfNecessary(value, targetValueType);
 				}
 			}
