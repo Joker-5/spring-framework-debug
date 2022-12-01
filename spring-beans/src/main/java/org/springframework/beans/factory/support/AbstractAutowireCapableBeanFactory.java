@@ -536,6 +536,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	// 2）Bean 属性填充，给 Bean 中的各种属性进行依赖注入，这个过程其实就是在 IoC 容器中寻找属性是否有对应的 Bean 依赖，
 	// 如果有就注入到当前 bean 的相应属性中
 	// 3）Bean 初始化
+	
+	// 该方法管理了 Bean 生命周期中所有关键节点，主要功能包括
+	// - Bean 实例的创建；
+	// - Bean 对象依赖的注入；
+	// - 定制类初始化方法的回调；
+	// - Disposable 方法的注册。
 	protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
 			throws BeanCreationException {
 
@@ -651,7 +657,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// 注册一次性的 Bean，
 			// 此处会第九次调用 Bean 后置处理器，判断 Bean 是否有销毁方法，
 			// 实际上就是取出在第四次调用时解析的 @PreDestroy 方法，
-			// 如果有的话则将 Bean 注册到销毁集合中，在容器关闭时使用
+			// 如果有的话则将 Bean 注册到销毁集合中，在 Spring 容器关闭时使用
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		} catch (BeanDefinitionValidationException ex) {
 			throw new BeanCreationException(
