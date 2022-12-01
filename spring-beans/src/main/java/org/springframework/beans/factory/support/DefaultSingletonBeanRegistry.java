@@ -445,6 +445,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	public void registerDisposableBean(String beanName, DisposableBean bean) {
 		synchronized (this.disposableBeans) {
+			// disposableBeans 属性将暂存刚才获取到的 DisposableBeanAdapter 实例(其属性 destroyMethodName 记录了使用哪种 destroy 方法)，
+			// 直到 AnnotationConfigApplicationContext 的 close 方法被调用。
 			this.disposableBeans.put(beanName, bean);
 		}
 	}
@@ -588,6 +590,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		synchronized (this.disposableBeans) {
 			disposableBeanNames = StringUtils.toStringArray(this.disposableBeans.keySet());
 		}
+		// 遍历 disposableBeans 属性逐一获取 DisposableBean，
+		// 依次调用其中的 close 或者 shutdown 方法：
 		for (int i = disposableBeanNames.length - 1; i >= 0; i--) {
 			destroySingleton(disposableBeanNames[i]);
 		}

@@ -1,22 +1,26 @@
 package com.joe.aop.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
  * Created by joker on 2022/11/25.
  */
-@Component
+//@Service
 public class LightService {
+	Logger logger = LoggerFactory.getLogger(LightService.class);
+
 	public void start() {
-		System.out.println("turn on all lights");
+		logger.error("turn on all lights");
 	}
 
 	public void shutdown() {
-		System.out.println("turn off all lights");
+		logger.error("turn off all lights");
 	}
 
 	public void check() {
-		System.out.println("check all lights");
+		logger.error("check all lights");
 	}
 }

@@ -20,6 +20,6 @@ public class LightMgrService implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		lightService.check();
+//		lightService.check();
 	}
 }
