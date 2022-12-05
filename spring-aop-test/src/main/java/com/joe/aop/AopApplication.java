@@ -12,6 +12,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class AopApplication {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(AopApplication.class, args);
-		context.close();
+//		context.close();
 	}
 }
