@@ -36,8 +36,10 @@ import org.springframework.util.comparator.Comparators;
  */
 public class ConvertingComparator<S, T> implements Comparator<S> {
 
+	// 基准比较器，即最终要调用的比较器
 	private final Comparator<T> comparator;
 
+	// converter 本质上是一个 lambda 回调函数，用来将传递的参数转化为基准比较器需要进行比较的参数类型
 	private final Converter<S, T> converter;
 
 
@@ -75,6 +77,7 @@ public class ConvertingComparator<S, T> implements Comparator<S> {
 
 
 	@Override
+	// 核心比较方法，先转化后进行比较
 	public int compare(S o1, S o2) {
 		T c1 = this.converter.convert(o1);
 		T c2 = this.converter.convert(o2);
