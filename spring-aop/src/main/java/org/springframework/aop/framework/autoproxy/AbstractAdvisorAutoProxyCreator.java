@@ -74,7 +74,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	@Nullable
 	protected Object[] getAdvicesAndAdvisorsForBean(
 			Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
-
+		// 从所有候选的 advisor 中选出合适的 advisor，
+		// 之所以有这样一个匹配的过程，是因为 AOP 拦截点可能会配置多个，而我们执行的方法不一定会被所有的拦截配置拦截。
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
@@ -93,10 +94,13 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
+		// 获取所有候选的 Advisor
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		// 根据所有候选的 Advisor 与当前 Bean 信息获取匹配的 Advisor
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		extendAdvisors(eligibleAdvisors);
 		if (!eligibleAdvisors.isEmpty()) {
+			// 对 Advisor 集合进行排序，而这决定了增强方法的执行顺序
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);
 		}
 		return eligibleAdvisors;

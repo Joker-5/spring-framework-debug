@@ -97,6 +97,7 @@ public interface BeanPostProcessor {
 	 * @see org.springframework.beans.factory.FactoryBean
 	 */
 	@Nullable
+	// 其中 AbstractAutoProxyCreator 负责创建 AOP 代理对象
 	default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}

@@ -347,6 +347,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		// Create proxy if we have advice.
+		// 获取 specificInterceptors，为创建代理对象做准备
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
@@ -471,7 +472,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 				evaluateProxyInterfaces(beanClass, proxyFactory);
 			}
 		}
-
+		// 获取增强方法对象 advisor，其在数组中的顺序决定了面临多个增强时执行的先后顺序
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
 		proxyFactory.addAdvisors(advisors);
 		proxyFactory.setTargetSource(targetSource);

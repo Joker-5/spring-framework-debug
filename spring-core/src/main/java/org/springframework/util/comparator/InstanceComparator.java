@@ -53,20 +53,25 @@ public class InstanceComparator<T> implements Comparator<T> {
 
 
 	@Override
+	// AOP 增强注解执行先后顺序比较时调用的核心方法
 	public int compare(T o1, T o2) {
 		int i1 = getOrder(o1);
 		int i2 = getOrder(o2);
+		// 按照 i1、i2 的顺序升序排列，getOrder() 返回的值越小，优先级越高
 		return (Integer.compare(i1, i2));
 	}
-
+	// 获取排序的比较值
 	private int getOrder(@Nullable T object) {
 		if (object != null) {
+			// 属性 instanceOrder 中的元素的顺序就是排序的比较值，
+			// 即元素在 instanceOrder 数组中越靠前，调用的优先级越高
 			for (int i = 0; i < this.instanceOrder.length; i++) {
 				if (this.instanceOrder[i].isInstance(object)) {
 					return i;
 				}
 			}
 		}
+		// 元素不在候选数组中就返回候选数组的长度作为比较值(也就是排在最后面)
 		return this.instanceOrder.length;
 	}
 

@@ -396,7 +396,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 
 		Object result = existingBean;
-		// 遍历数组进行处理
+		// 遍历数组依次进行 Bean 后置处理
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {

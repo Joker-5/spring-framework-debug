@@ -70,6 +70,8 @@ import org.springframework.util.comparator.InstanceComparator;
 @SuppressWarnings("serial")
 public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFactory implements Serializable {
 
+	// 通过下面的静态代码块可以看到，METHOD_COMPARATOR 本质上是一个连续比较器，
+	// 其由 adviceKindComparator，methodNameComparator 通过 thenComparing() 连接而成
 	private static final Comparator<Method> METHOD_COMPARATOR;
 
 	static {
@@ -81,6 +83,9 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		Comparator<Method> adviceKindComparator = new ConvertingComparator<>(
 				new InstanceComparator<>(
 						Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class),
+				// 转换方法，将需要比较的参数转化为基准比较器需要的类型，
+				// 下面的 lambda 表达式逻辑是返回 method 上标记的增强注解，
+				// 即 Pointcut.class, Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class 这些类对应的注解
 				(Converter<Method, Annotation>) method -> {
 					AspectJAnnotation<?> ann = AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(method);
 					return (ann != null ? ann.getAnnotation() : null);
@@ -159,6 +164,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		return advisors;
 	}
 
+	// 获取 Advisor 方法
 	private List<Method> getAdvisorMethods(Class<?> aspectClass) {
 		final List<Method> methods = new ArrayList<>();
 		ReflectionUtils.doWithMethods(aspectClass, method -> {
@@ -168,6 +174,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 			}
 		}, ReflectionUtils.USER_DECLARED_METHODS);
 		if (methods.size() > 1) {
+			// 对获取到的方法排序
 			methods.sort(METHOD_COMPARATOR);
 		}
 		return methods;
