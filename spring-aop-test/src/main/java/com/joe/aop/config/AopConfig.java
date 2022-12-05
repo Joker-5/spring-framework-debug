@@ -15,17 +15,19 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class AopConfig {
-	@Around("execution(* com.joe.aop.service.ElectricService.pay()) ")
-	public void recordPayPerformance(ProceedingJoinPoint joinPoint) throws Throwable {
-		long start = System.currentTimeMillis();
-		joinPoint.proceed();
-		long end = System.currentTimeMillis();
-		System.out.println("Pay method time cost（ms）: " + (end - start));
+
+	@Before("execution(* com.joe.aop.service.ElectricService.charge()) ")
+	public void checkAuthority(JoinPoint pjp) throws Throwable {
+		System.out.println("validating user authority");
+		Thread.sleep(1000);
 	}
 
-	@Before("execution(* com.joe.aop.service.AdminUserService.login(..)) ")
-	public void logAdminLogin(JoinPoint pjp) throws Throwable {
-		System.out.println("! admin login ...");
+	@Around("execution(* com.joe.aop.service.ElectricService.doCharge()) ")
+	public void recordPerformance(ProceedingJoinPoint pjp) throws Throwable {
+		long start = System.currentTimeMillis();
+		pjp.proceed();
+		long end = System.currentTimeMillis();
+		System.out.println("charge method time cost: " + (end - start));
 	}
-	
+
 }

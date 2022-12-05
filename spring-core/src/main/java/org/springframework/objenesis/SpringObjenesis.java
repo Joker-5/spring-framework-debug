@@ -96,6 +96,8 @@ public class SpringObjenesis implements Objenesis {
 	 * @throws ObjenesisException if instance creation failed
 	 */
 	public <T> T newInstance(Class<T> clazz, boolean useCache) {
+		// 注意：objenesis 最后使用了 JDK 的 ReflectionFactory.newConstructorForSerialization() 完成了代理对象的实例化，
+		// 而这个不会初始化类成员变量，使用时需要格外注意
 		if (!useCache) {
 			return newInstantiatorOf(clazz).newInstance();
 		}
