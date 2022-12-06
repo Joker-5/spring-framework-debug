@@ -8,14 +8,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ElectricService {
-	@Autowired
-	private ElectricService electricService;
+
 
 	public void charge() {
-		electricService.doCharge();
-	}
-
-	public void doCharge() {
 		System.out.println("Electric charging ...");
 	}
 }

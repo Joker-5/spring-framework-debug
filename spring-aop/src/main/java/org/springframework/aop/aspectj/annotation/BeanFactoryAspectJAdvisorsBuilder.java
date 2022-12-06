@@ -125,6 +125,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 								MetadataAwareAspectInstanceFactory factory =
 										new PrototypeAspectInstanceFactory(this.beanFactory, beanName);
 								this.aspectFactoryCache.put(beanName, factory);
+								// 从 advisorFactory 中获取 advisor
 								advisors.addAll(this.advisorFactory.getAdvisors(factory));
 							}
 						}
