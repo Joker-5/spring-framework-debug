@@ -16,18 +16,15 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AopConfig {
 
-	@Before("execution(* com.joe.aop.service.ElectricService.charge()) ")
-	public void checkAuthority(JoinPoint pjp) throws Throwable {
-		System.out.println("validating user authority");
-		Thread.sleep(1000);
+
+	@Before("execution(* com.joe.aop.service.ElectricService.charge())")
+	public void zlogBeforeMethod(JoinPoint pjp) throws Throwable {
+		System.out.println("step into ->" + pjp.getSignature());
 	}
 
-	@Around("execution(* com.joe.aop.service.ElectricService.doCharge()) ")
-	public void recordPerformance(ProceedingJoinPoint pjp) throws Throwable {
-		long start = System.currentTimeMillis();
-		pjp.proceed();
-		long end = System.currentTimeMillis();
-		System.out.println("charge method time cost: " + (end - start));
+	@Before("execution(* com.joe.aop.service.ElectricService.charge()) ")
+	public void validateAuthority(JoinPoint pjp) throws Throwable {
+		throw new RuntimeException("authority check failed");
 	}
 
 }
